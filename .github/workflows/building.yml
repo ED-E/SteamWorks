@@ -1,0 +1,76 @@
+name: Build SteamWorks x64
+
+on:
+  push:
+    paths:
+      - '**/SteamWorks/**'
+      - '.github/workflows/build.yml'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      STEAMWORKS_SDK: ${{ runner.workspace }}\steamworks-sdk
+      SM_PATH:       ${{ runner.workspace }}\sourcemod
+      MMS_PATH:      ${{ runner.workspace }}\metamod
+      HL2SDK_ROOT:   ${{ runner.workspace }}\hl2sdk
+
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v3
+
+      - name: Checkout SteamworksSDK sub-repo
+        uses: actions/checkout@v3
+        with:
+          repository: rlabrecque/SteamworksSDK
+          path: steamworks-sdk
+
+      - name: Checkout Sourcemod
+        uses: actions/checkout@v3
+        with:
+          repository: alliedmodders/sourcemod
+          path: sourcemod
+
+      - name: Checkout MetaMod-Source
+        uses: actions/checkout@v3
+        with:
+          repository: alliedmodders/metamod-source
+          path: metamod
+
+      - name: Checkout HL2SDK
+        uses: actions/checkout@v3
+        with:
+          repository: alliedmodders/hl2sdk
+          path: hl2sdk
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install AMBuild
+        run: |
+          pip install ambuild2
+
+      - name: Configure build for x64
+        run: |
+          python configure.py \
+            --steamworks-path "%STEAMWORKS_SDK%" \
+            --sm-path        "%SM_PATH%" \
+            --mms-path       "%MMS_PATH%" \
+            --hl2sdk-root    "%HL2SDK_ROOT%" \
+            --sdks           tf2 \
+            --targets        x86_64 \
+            --enable-optimize
+
+      - name: Build SteamWorks solution
+        run: |
+          msbuild SteamWorks.sln /p:Configuration=Release /p:Platform=x64
+
+      - name: Upload 64-bit DLL
+        uses: actions/upload-artifact@v3
+        with:
+          name: SteamWorks-64bit
+          path: "bin\Release\SteamWorks.ext.dll"
