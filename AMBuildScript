@@ -209,7 +209,13 @@ class SteamWorksConfig(object):
         '/GR-',
         '/TP',
       ]
-      cxx.linkflags += [
+# set machine based on whether we're building x86 or x86_64
+    if cxx.target.arch == 'x86_64':
+	cxx.linkflags += ['/MACHINE:X64']
+	cxx.defines  += ['X64']
+    else:
+	cxx.linkflags += ['/MACHINE:X86']
+      	cxx.linkflags += [
         '/MACHINE:X86',
         '/SUBSYSTEM:WINDOWS',
         'kernel32.lib',
