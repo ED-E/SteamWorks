@@ -73,4 +73,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: SteamWorks-64bit
-          path: "bin\Release\SteamWorks.ext.dll"
+          path: 'bin/Release/SteamWorks.ext.dll'
