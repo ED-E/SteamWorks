@@ -16,7 +16,7 @@ jobs:
         exclude:
          - os: macos-latest
            python-version: 3.3
-         - os: windows-2019
+         - os: windows-latest
            python-version: 3.3
 
     steps:
